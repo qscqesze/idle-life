@@ -1,0 +1,2 @@
+# idle-life
+idle game
