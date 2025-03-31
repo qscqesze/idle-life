@@ -233,161 +233,13 @@
 
       <!-- 策略系统界面 -->
       <div class="tab-content strategy-tab" v-show="activeTab === 'strategy'">
-        <h2>自动策略系统</h2>
-        
-        <div class="strategy-section">
-          <h3>自动装备策略</h3>
-          <div class="strategy-toggle">
-            <label class="switch">
-              <input type="checkbox" v-model="player.strategies.autoEquip.enabled">
-              <span class="slider round"></span>
-            </label>
-            <span>启用自动装备</span>
-          </div>
-          
-          <div class="strategy-options" v-if="player.strategies.autoEquip.enabled">
-            <div class="option-group">
-              <h4>装备优先级</h4>
-              <div class="priority-option">
-                <select v-model="player.strategies.autoEquip.priorityType">
-                  <option value="overall">总体评分优先</option>
-                  <option value="attack">攻击力优先</option>
-                  <option value="defense">防御力优先</option>
-                  <option value="custom">自定义属性权重</option>
-                </select>
-              </div>
-              
-              <div class="custom-weights" v-if="player.strategies.autoEquip.priorityType === 'custom'">
-                <div class="weight-item">
-                  <label>攻击力权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.attack" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>防御力权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.defense" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>力量权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.strength" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>敏捷权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.agility" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>体力权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.vitality" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>智力权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.intelligence" min="0" max="10" step="0.1">
-                </div>
-                <div class="weight-item">
-                  <label>幸运权重:</label>
-                  <input type="number" v-model.number="player.strategies.autoEquip.weights.luck" min="0" max="10" step="0.1">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="strategy-section">
-          <h3>自动转生策略</h3>
-          <div class="strategy-toggle">
-            <label class="switch">
-              <input type="checkbox" v-model="player.strategies.autoPrestige.enabled">
-              <span class="slider round"></span>
-            </label>
-            <span>启用自动转生</span>
-          </div>
-          
-          <div class="strategy-options" v-if="player.strategies.autoPrestige.enabled">
-            <div class="option-group">
-              <h4>转生策略</h4>
-              <select v-model="player.strategies.autoPrestige.strategy">
-                <option value="immediate">达到条件立即转生</option>
-                <option value="delay">达到条件后延迟转生</option>
-              </select>
-              
-              <div v-if="player.strategies.autoPrestige.strategy === 'delay'">
-                <h4>延迟等级</h4>
-                <div class="slider-container">
-                  <input 
-                    type="range" 
-                    v-model.number="player.strategies.autoPrestige.delayLevels" 
-                    min="0" 
-                    max="20" 
-                    step="1"
-                  >
-                  <span>{{player.strategies.autoPrestige.delayLevels}} 级</span>
-                </div>
-                <p class="strategy-info">将在达到转生条件后再提升 {{player.strategies.autoPrestige.delayLevels}} 级后转生</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="strategy-section">
-          <h3>自动切换区域策略</h3>
-          <div class="strategy-toggle">
-            <label class="switch">
-              <input type="checkbox" v-model="player.strategies.autoArea.enabled">
-              <span class="slider round"></span>
-            </label>
-            <span>启用自动切换区域</span>
-          </div>
-          
-          <div class="strategy-options" v-if="player.strategies.autoArea.enabled">
-            <div class="option-group">
-              <h4>切换策略</h4>
-              <select v-model="player.strategies.autoArea.strategy">
-                <option value="highest">选择可用最高区域</option>
-                <option value="efficient">选择最高效率区域</option>
-                <option value="levelBased">基于玩家等级选择</option>
-              </select>
-              
-              <div v-if="player.strategies.autoArea.strategy === 'levelBased'">
-                <h4>等级偏移</h4>
-                <div class="slider-container">
-                  <input 
-                    type="range" 
-                    v-model.number="player.strategies.autoArea.levelOffset" 
-                    min="-10" 
-                    max="10" 
-                    step="1"
-                  >
-                  <span>{{player.strategies.autoArea.levelOffset >= 0 ? '+' : ''}}{{player.strategies.autoArea.levelOffset}}</span>
-                </div>
-                <p class="strategy-info">选择 (玩家等级 {{player.strategies.autoArea.levelOffset >= 0 ? '+' : ''}}{{player.strategies.autoArea.levelOffset}}) 对应的区域</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="strategy-settings">
-          <h3>策略执行设置</h3>
-          <div class="setting-group">
-            <label>策略检查间隔:</label>
-            <select v-model="player.strategies.checkInterval">
-              <option value="1">非常频繁 (每1秒)</option>
-              <option value="5">频繁 (每5秒)</option>
-              <option value="10">普通 (每10秒)</option>
-              <option value="30">较少 (每30秒)</option>
-              <option value="60">稀少 (每60秒)</option>
-            </select>
-          </div>
-          
-          <div class="strategy-status">
-            <div class="status-item">
-              <span>上次执行:</span>
-              <span>{{lastStrategyExecutionTime || '从未'}}</span>
-            </div>
-            <div class="status-item">
-              <span>下次执行:</span>
-              <span>{{nextStrategyExecutionTime}}</span>
-            </div>
-          </div>
-        </div>
+        <strategy-system
+          :player="player"
+          :item-config="itemConfig"
+          :last-strategy-execution="lastStrategyExecution"
+          :last-strategy-execution-time="lastStrategyExecutionTime"
+          @update-strategy="updateStrategy"
+        />
       </div>
     </div>
   </div>
@@ -398,12 +250,14 @@
 import { gameConfig, playerConfig, itemConfig } from '../config/gameConfig';
 import CombatSystem from './CombatSystem.vue';
 import InventorySystem from './InventorySystem.vue';
+import StrategySystem from './StrategySystem.vue';
 
 export default {
   name: 'IdleGame',
   components: {
     CombatSystem,
-    InventorySystem
+    InventorySystem,
+    StrategySystem
   },
   data() {
     return {
@@ -586,6 +440,11 @@ export default {
         return '立即';
       }
       
+      // 确保strategies存在
+      if (!this.player.strategies) {
+        return '立即';
+      }
+      
       const now = Date.now();
       const nextTime = this.lastStrategyExecution + (this.player.strategies.checkInterval * 1000);
       const timeLeft = Math.max(0, (nextTime - now) / 1000);
@@ -610,7 +469,10 @@ export default {
     
     // 初始化玩家策略系统
     if (!this.player.strategies) {
+      console.log('初始化策略系统...');
       this.initializeStrategies();
+    } else {
+      console.log('策略系统已存在，无需初始化');
     }
   },
   
@@ -689,6 +551,7 @@ export default {
           
           // 初始化策略系统（如果不存在）
           if (!this.player.strategies) {
+            console.log('加载游戏时发现策略系统不存在，正在初始化...');
             this.initializeStrategies();
           }
           
@@ -740,6 +603,10 @@ export default {
     resetGame() {
       // 使用配置中的初始玩家数据
       this.player = JSON.parse(JSON.stringify(playerConfig.initialStats));
+      
+      // 初始化策略系统
+      this.initializeStrategies();
+      
       this.currentMonster = null;
       this.changeArea(this.areas[0]);
     },
@@ -769,7 +636,13 @@ export default {
       }
       
       // 执行自动策略
-      this.executeStrategies();
+      // 检查player.strategies是否存在，避免"Cannot read properties of undefined"错误
+      if (this.player.strategies) {
+        this.executeStrategies();
+      } else {
+        // 如果策略不存在，初始化策略系统
+        this.initializeStrategies();
+      }
     },
     
     spawnMonster() {
@@ -965,7 +838,7 @@ export default {
         // 获取对应品质的装备
         const itemList = this.itemTypes[randomSlot];
         if (itemList && qualityIndex < itemList.length) {
-          const item = { ...itemList[qualityIndex], slot: randomSlot };
+          const item = { ...itemList[qualityIndex], slot: randomSlot, identified: true };
           
           // 添加到背包
           this.player.inventory.push(item);
@@ -984,11 +857,12 @@ export default {
     equipItem(item, inventoryIndex) {
       // 如果已经装备了物品，先卸下并放入背包
       if (this.player.equipment[item.slot]) {
-        this.player.inventory.push(this.player.equipment[item.slot]);
+        const unequippedItem = {...this.player.equipment[item.slot], identified: true};
+        this.player.inventory.push(unequippedItem);
       }
       
       // 装备新物品
-      this.player.equipment[item.slot] = item;
+      this.player.equipment[item.slot] = {...item, identified: true};
       
       // 从背包中移除
       this.player.inventory.splice(inventoryIndex, 1);
@@ -998,7 +872,8 @@ export default {
       // 确认装备槽有物品
       if (this.player.equipment[slot]) {
         // 将物品添加到背包
-        this.player.inventory.push(this.player.equipment[slot]);
+        const unequippedItem = {...this.player.equipment[slot], identified: true};
+        this.player.inventory.push(unequippedItem);
         
         // 清空装备槽
         this.player.equipment[slot] = null;
@@ -1403,34 +1278,56 @@ export default {
           enabled: false,
           strategy: 'highest', // 'highest', 'efficient', 'levelBased'
           levelOffset: 0 // 区域等级 = 玩家等级 + 偏移
+        },
+        
+        // 自动出售策略
+        autoSell: {
+          enabled: false,
+          byQuality: {},
+          compareWithEquipped: false,
+          keepBetterItems: false
         }
       };
     },
     
-    // 执行自动策略
+    // 执行策略系统
     executeStrategies() {
-      // 检查是否需要执行策略
       const now = Date.now();
-      if (this.lastStrategyExecution && 
-          (now - this.lastStrategyExecution < this.player.strategies.checkInterval * 1000)) {
-        return; // 还未到检查时间
+      
+      // 检查是否存在策略配置
+      if (!this.player.strategies) {
+        this.initializeStrategies();
+        this.lastStrategyExecution = now;
+        this.lastStrategyExecutionTime = new Date().toLocaleString();
+        return;
       }
       
-      // 记录本次执行时间
-      this.lastStrategyExecution = now;
-      this.lastStrategyExecutionTime = new Date().toLocaleTimeString();
+      // 检查是否需要执行策略
+      if (this.lastStrategyExecution && now - this.lastStrategyExecution < this.player.strategies.checkInterval * 1000) {
+        return;
+      }
       
-      // 执行三个自动策略
+      this.lastStrategyExecution = now;
+      this.lastStrategyExecutionTime = new Date().toLocaleString();
+      
+      // 执行自动装备策略
       if (this.player.strategies.autoEquip.enabled) {
         this.executeAutoEquipStrategy();
       }
       
+      // 执行自动转生策略
       if (this.player.strategies.autoPrestige.enabled) {
         this.executeAutoPrestigeStrategy();
       }
       
+      // 执行自动切换区域策略
       if (this.player.strategies.autoArea.enabled) {
         this.executeAutoAreaStrategy();
+      }
+      
+      // 执行自动出售策略
+      if (this.player.strategies.autoSell.enabled) {
+        this.executeAutoSellStrategy();
       }
     },
     
@@ -1626,6 +1523,46 @@ export default {
       if (targetArea && (!this.currentArea || this.currentArea.id !== targetArea.id)) {
         this.changeArea(targetArea);
         this.addCombatLog(`自动策略: 切换到区域 ${targetArea.name}`);
+      }
+    },
+    
+    // 执行自动出售策略
+    executeAutoSellStrategy() {
+      const inventory = this.player.inventory;
+      const equippedItems = this.player.equippedItems;
+      
+      for (let i = inventory.length - 1; i >= 0; i--) {
+        const item = inventory[i];
+        
+        // 检查是否按品质出售
+        if (this.player.strategies.autoSell.byQuality[item.rarity]) {
+          // 如果需要与已装备物品比较
+          if (this.player.strategies.autoSell.compareWithEquipped) {
+            const equippedItem = equippedItems[item.type];
+            if (equippedItem) {
+              // 如果保留更好的物品
+              if (this.player.strategies.autoSell.keepBetterItems) {
+                if (this.calculateItemScore(item) > this.calculateItemScore(equippedItem)) {
+                  continue; // 跳过这个物品，因为它比已装备的更好
+                }
+              }
+            }
+          }
+          
+          // 出售物品
+          this.sellItem(item, i);
+        }
+      }
+    },
+    
+    // 更新策略设置
+    updateStrategy({ strategy, field, value }) {
+      if (field === null) {
+        // 直接更新策略值
+        this.player.strategies[strategy] = value;
+      } else {
+        // 更新策略对象的特定字段
+        this.player.strategies[strategy][field] = value;
       }
     },
   }
