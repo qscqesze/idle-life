@@ -19,6 +19,61 @@
       </div>
     </div>
 
+    <!-- 内容区域 -->
+    <div class="tab-contents">
+      <!-- 玩家信息区域 -->
+      <div class="player-info">
+        <div class="player-stats">
+          <div class="stat-item">
+            <div class="stat-label">等级</div>
+            <div class="stat-value">{{ player.level }}</div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-label">经验</div>
+            <div class="stat-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" :style="{ width: (player.exp / expNeededForLevelUp * 100) + '%' }"></div>
+              </div>
+              <div class="progress-text">{{ player.exp }} / {{ expNeededForLevelUp }}</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-label">金币</div>
+            <div class="stat-value">{{ player.gold }}</div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-label">生命</div>
+            <div class="stat-progress">
+              <div class="progress-bar health-bar">
+                <div class="progress-fill" :style="{ width: playerHealthPercentage + '%' }"></div>
+              </div>
+              <div class="progress-text">{{ Math.floor(player.currentHp) }} / {{ Math.floor(player.maxHp) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 状态区域 -->
+      <div class="tab-content stats-tab" v-show="activeTab === 'stats'">
+        <h2>角色属性</h2>
+        
+        <div class="stats-container">
+          <!-- 基础属性 -->
+          <div class="stats-section">
+            <h3>基础属性</h3>
+            <div class="stats-grid">
+              <div class="stat-block">
+                <!-- 属性内容 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- 玩家状态栏 -->
     <div class="player-status-bar">
       <div class="player-core-stats">
@@ -26,91 +81,19 @@
           <div class="stat-label">等级:</div>
           <div class="stat-value">{{ player.level }}</div>
         </div>
+        
         <div class="stat-item">
           <div class="stat-label">经验:</div>
           <div class="stat-value">{{ player.exp }}/{{ expNeededForLevelUp }}</div>
         </div>
+        
         <div class="stat-item">
           <div class="stat-label">金币:</div>
           <div class="stat-value">{{ player.gold }}</div>
         </div>
-        <div class="stat-item prestige-stat">
-          <div class="stat-label">转生等级:</div>
-          <div class="stat-value">{{ prestige.level }}</div>
-        </div>
-        
-        <!-- 生命值和魔法值进度条 -->
-        <div class="resource-bars">
-          <div class="resource-bar hp-bar">
-            <div class="bar-label">HP: {{ Math.ceil(player.currentHp) }}/{{ player.maxHp }}</div>
-            <div class="bar-container">
-              <div class="bar-fill" :style="{ width: playerHealthPercentage + '%' }"></div>
-            </div>
-          </div>
-          <div class="resource-bar mana-bar">
-            <div class="bar-label">MP: {{ Math.ceil(player.currentMana) }}/{{ player.baseMana }}</div>
-            <div class="bar-container">
-              <div class="bar-fill" :style="{ width: (player.currentMana/player.baseMana) * 100 + '%' }"></div>
-            </div>
-          </div>
-        </div>
       </div>
-      
-      <!-- 详细属性信息按钮 -->
-      <button @click="toggleStatsPanel" class="stats-toggle-btn">
-        {{ showDetailedStats ? '隐藏详细属性' : '显示详细属性' }}
-      </button>
     </div>
     
-    <!-- 详细属性面板（可折叠） -->
-    <div class="detailed-stats-panel" v-if="showDetailedStats">
-      <div class="stats-grid">
-        <div class="stat-item" title="力量：增加物理攻击力">
-          <div class="stat-label">力量:</div>
-          <div class="stat-value">{{ player.strength }}</div>
-        </div>
-        <div class="stat-item" title="敏捷：增加闪避率和暴击率">
-          <div class="stat-label">敏捷:</div>
-          <div class="stat-value">{{ player.agility }}</div>
-        </div>
-        <div class="stat-item" title="体力：增加最大生命值和物理防御">
-          <div class="stat-label">体力:</div>
-          <div class="stat-value">{{ player.vitality }}</div>
-        </div>
-        <div class="stat-item" title="智力：增加魔法攻击和魔法防御">
-          <div class="stat-label">智力:</div>
-          <div class="stat-value">{{ player.intelligence }}</div>
-        </div>
-        <div class="stat-item" title="幸运：增加掉落率、暴击率和暴击伤害">
-          <div class="stat-label">幸运:</div>
-          <div class="stat-value">{{ player.luck }}</div>
-        </div>
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">攻击力:</div>
-          <div class="stat-value">{{ totalAttack }}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">防御力:</div>
-          <div class="stat-value">{{ totalDefense }}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">暴击率:</div>
-          <div class="stat-value">{{ totalCritRate }}%</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">暴击伤害:</div>
-          <div class="stat-value">{{ totalCritDamage }}%</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">闪避率:</div>
-          <div class="stat-value">{{ totalDodgeRate }}%</div>
-        </div>
-      </div>
-    </div>
-
     <!-- 主要内容区域的标签页导航 -->
     <div class="game-tabs">
       <div 
@@ -141,8 +124,15 @@
       >
         自动策略
       </div>
+      <div 
+        class="tab-item" 
+        :class="{ active: activeTab === 'pet' }"
+        @click="activeTab = 'pet'"
+      >
+        宠物
+      </div>
     </div>
-
+    
     <!-- 主要内容区域 -->
     <div class="game-content">
       <!-- 战斗区域 -->
@@ -153,11 +143,13 @@
           :current-monster="currentMonster"
           :combat-logs="combatLogs"
           :attack-animation="attackAnimation"
+          :battle-tips="battleTips"
           :total-attack="totalAttack"
           :total-defense="totalDefense"
           :total-crit-rate="totalCritRate"
           :total-crit-damage="totalCritDamage"
           :total-dodge-rate="totalDodgeRate"
+          :active-pet="activePet"
           @player-attack="playerAttack"
           @monster-attack="monsterAttack"
           @spawn-monster="spawnMonster"
@@ -165,7 +157,7 @@
           @player-defeated="playerDefeated"
         />
       </div>
-
+      
       <!-- 背包与装备区域 -->
       <div class="tab-content inventory-tab" v-show="activeTab === 'inventory'">
         <inventory-system
@@ -179,7 +171,7 @@
           @sell-all-items="sellAllItems"
         />
       </div>
-
+      
       <!-- 区域选择区域 -->
       <div class="tab-content areas-tab" v-show="activeTab === 'areas'">
         <h2>选择冒险区域 <span class="area-subtitle">当前最高：第{{maxReachedLevel}}层</span></h2>
@@ -188,18 +180,6 @@
           <button @click="prevAreaPage" :disabled="currentAreaPage === 0">上一页</button>
           <span>第 {{currentAreaPage + 1}} 页</span>
           <button @click="nextAreaPage" :disabled="currentAreaPage >= Math.floor((maxReachedLevel - 1) / areasPerPage)">下一页</button>
-        </div>
-        
-        <div class="prestige-section">
-          <h3>转生系统</h3>
-          <div class="prestige-info">
-            <p>当前转生等级: <span class="prestige-level">{{prestige.level}}</span></p>
-            <p>全局加成倍率: <span class="prestige-bonus">{{prestigeMultiplier.toFixed(2)}}x</span></p>
-            <p>下次转生需要等级: <span>{{prestigeRequirement}}</span></p>
-          </div>
-          <button @click="performPrestige()" class="prestige-btn" :disabled="player.level < prestigeRequirement">
-            转生
-          </button>
         </div>
         
         <div class="areas-grid">
@@ -230,7 +210,7 @@
           </div>
         </div>
       </div>
-
+      
       <!-- 策略系统界面 -->
       <div class="tab-content strategy-tab" v-show="activeTab === 'strategy'">
         <strategy-system
@@ -239,6 +219,22 @@
           :last-strategy-execution="lastStrategyExecution"
           :last-strategy-execution-time="lastStrategyExecutionTime"
           @update-strategy="updateStrategy"
+        />
+      </div>
+      
+      <!-- 宠物系统界面 -->
+      <div class="tab-content pet-tab" v-show="activeTab === 'pet'">
+        <pet-system
+          :player="player"
+          :player-pets="playerPets"
+          :pet-equipments="petEquipments"
+          @pet-equip-item="equipPetItem"
+          @pet-unequip-item="unequipPetItem"
+          @add-pet="addPet"
+          @update-player-gold="updatePlayerGold"
+          @pet-level-up="onPetLevelUp"
+          @save-pet-data="saveGame"
+          @show-notification="addCombatLog"
         />
       </div>
     </div>
@@ -251,13 +247,15 @@ import { gameConfig, playerConfig, itemConfig } from '../config/gameConfig';
 import CombatSystem from './CombatSystem.vue';
 import InventorySystem from './InventorySystem.vue';
 import StrategySystem from './StrategySystem.vue';
+import PetSystem from './PetSystem.vue';
 
 export default {
   name: 'IdleGame',
   components: {
     CombatSystem,
     InventorySystem,
-    StrategySystem
+    StrategySystem,
+    PetSystem
   },
   data() {
     return {
@@ -272,25 +270,14 @@ export default {
       showDetailedStats: false,
       
       // 使用配置中的初始玩家数据
-      player: JSON.parse(JSON.stringify(playerConfig.initialStats)),
-      
+      player: { ...playerConfig.initialStats },
       currentMonster: null,
-      currentArea: null,
       
-      // 修改区域系统为无限层级
-      currentLevel: 1,
+      // 区域相关数据
+      currentArea: null,
       maxReachedLevel: 1,
       areasPerPage: 9,
       currentAreaPage: 0,
-      
-      // 添加转生/重生系统
-      prestige: {
-        level: 0,
-        multiplier: 1,
-        cost: 100
-      },
-      
-      // 修改区域定义方式
       areas: [], // 将在created生命周期中动态生成
       
       // 使用配置中的物品类型
@@ -304,6 +291,10 @@ export default {
       // 策略系统相关数据
       lastStrategyExecution: 0,
       lastStrategyExecutionTime: null,
+      
+      // 宠物系统相关数据
+      playerPets: [],
+      petEquipments: [],
     };
   },
   
@@ -330,6 +321,12 @@ export default {
             attack += this.player.equipment[slot].allStats * 2;
           }
         }
+      }
+      
+      // 宠物加成
+      if (this.activePet && this.activePet.type && this.activePet.type.bonusType === 'attack') {
+        const bonusValue = this.getPetBonusValue(this.activePet);
+        attack += bonusValue;
       }
       
       return Math.floor(attack);
@@ -359,6 +356,12 @@ export default {
         }
       }
       
+      // 宠物加成
+      if (this.activePet && this.activePet.type && this.activePet.type.bonusType === 'defense') {
+        const bonusValue = this.getPetBonusValue(this.activePet);
+        defense += bonusValue;
+      }
+      
       return Math.floor(defense);
     },
     
@@ -375,11 +378,19 @@ export default {
         }
       }
       
-      return critRate;
+      // 宠物加成
+      if (this.activePet && this.activePet.type && this.activePet.type.bonusType === 'critRate') {
+        const bonusValue = this.getPetBonusValue(this.activePet);
+        critRate += bonusValue;
+      }
+      
+      return Math.floor(critRate);
     },
     
     totalCritDamage() {
-      let critDamage = playerConfig.calculations.critDamage(this.player.luck);
+      let critDamage = playerConfig.calculations.critDamage(
+        this.player.luck
+      );
       
       // 装备加成
       for (const slot in this.player.equipment) {
@@ -388,11 +399,13 @@ export default {
         }
       }
       
-      return critDamage;
+      return Math.floor(critDamage);
     },
     
     totalDodgeRate() {
-      let dodgeRate = playerConfig.calculations.dodgeRate(this.player.agility);
+      let dodgeRate = playerConfig.calculations.dodgeRate(
+        this.player.agility
+      );
       
       // 装备加成
       for (const slot in this.player.equipment) {
@@ -401,7 +414,13 @@ export default {
         }
       }
       
-      return dodgeRate;
+      // 宠物加成
+      if (this.activePet && this.activePet.type && this.activePet.type.bonusType === 'dodgeRate') {
+        const bonusValue = this.getPetBonusValue(this.activePet);
+        dodgeRate += bonusValue;
+      }
+      
+      return Math.floor(dodgeRate);
     },
     
     expNeededForLevelUp() {
@@ -424,16 +443,6 @@ export default {
       return this.areas.slice(startIndex, endIndex);
     },
     
-    // 新增：获取转生需要的等级
-    prestigeRequirement() {
-      return 50 + (this.prestige.level * 10);
-    },
-    
-    // 修改名称避免与方法名冲突
-    prestigeMultiplier() {
-      return this.prestige.multiplier * (1 + (this.prestige.level * 0.2));
-    },
-    
     // 计算下次策略执行时间
     nextStrategyExecutionTime() {
       if (!this.lastStrategyExecution) {
@@ -454,8 +463,61 @@ export default {
       } else if (timeLeft < 60) {
         return `${Math.ceil(timeLeft)}秒后`;
       } else {
-        return `${Math.floor(timeLeft / 60)}分${Math.ceil(timeLeft % 60)}秒后`;
+        return `${Math.ceil(timeLeft / 60)}分钟后`;
       }
+    },
+    
+    // 宠物战斗属性计算
+    totalPetAttack() {
+      if (!this.activePet) return 0;
+      
+      let petAttack = this.activePet.baseAttack || 0;
+      
+      // 宠物等级和属性加成
+      if (this.activePet.type) {
+        petAttack += this.activePet.strength * 1.5;
+        petAttack *= Math.pow(this.activePet.type.growthRates.strength, this.activePet.level - 1);
+      }
+      
+      // 宠物装备加成
+      if (this.activePet.equipment) {
+        for (const slot in this.activePet.equipment) {
+          if (this.activePet.equipment[slot] && this.activePet.equipment[slot].attack) {
+            petAttack += this.activePet.equipment[slot].attack;
+          }
+        }
+      }
+      
+      return Math.floor(petAttack);
+    },
+    
+    totalPetDefense() {
+      if (!this.activePet) return 0;
+      
+      let petDefense = this.activePet.baseDefense || 0;
+      
+      // 宠物等级和属性加成
+      if (this.activePet.type) {
+        petDefense += this.activePet.vitality * 1.2;
+        petDefense *= Math.pow(this.activePet.type.growthRates.vitality, this.activePet.level - 1);
+      }
+      
+      // 宠物装备加成
+      if (this.activePet.equipment) {
+        for (const slot in this.activePet.equipment) {
+          if (this.activePet.equipment[slot] && this.activePet.equipment[slot].defense) {
+            petDefense += this.activePet.equipment[slot].defense;
+          }
+        }
+      }
+      
+      return Math.floor(petDefense);
+    },
+    
+    // 获取当前激活的宠物（默认第一个）
+    activePet() {
+      if (this.playerPets.length === 0) return null;
+      return this.playerPets[0]; // 默认返回第一个宠物，后续可以添加宠物切换功能
     },
   },
   
@@ -646,26 +708,16 @@ export default {
     },
     
     spawnMonster() {
-      // 随机选择一个怪物
-      const monsterTemplate = this.currentArea.monsters[Math.floor(Math.random() * this.currentArea.monsters.length)];
+      // 如果没有当前区域，不生成怪物
+      if (!this.currentArea) {
+        console.log('没有选择区域，无法生成怪物');
+        return;
+      }
       
-      // 根据区域等级和玩家属性动态调整怪物强度
-      const monsterLevel = this.currentArea.level;
-      const prestigeBonus = Math.pow(1.05, this.prestige.level);
-      
-      this.currentMonster = {
-        ...monsterTemplate,
-        level: monsterLevel,
-        maxHp: monsterTemplate.baseHp * prestigeBonus,
-        exp: monsterTemplate.baseExp * prestigeBonus,
-        gold: monsterTemplate.baseGold * prestigeBonus,
-        attack: 5 * Math.pow(1.1, monsterLevel) * prestigeBonus,
-        defense: 2 * Math.pow(1.1, monsterLevel) * prestigeBonus
-      };
-      
-      this.currentMonster.currentHp = this.currentMonster.maxHp;
-      
-      this.addCombatLog(`遇到了Lv.${this.currentMonster.level}${this.currentMonster.name}！`);
+      // 直接生成怪物
+      this.currentMonster = this.generateMonster(this.currentArea);
+      this.isMonsterAlive = true;
+      this.addCombatLog(`发现了一只 ${this.currentMonster.name} (Lv.${this.currentMonster.level})`);
     },
     
     playerAttack() {
@@ -689,210 +741,65 @@ export default {
       } else {
         this.addCombatLog(`你对${this.currentMonster.name}造成${damage.toFixed(1)}点伤害！`);
       }
+      
+      // 宠物攻击 - 如果宠物有"龙息"特殊能力
+      if (this.activePet && this.activePet.type && 
+          this.activePet.type.specialAbility.effect === 'extraDamage' &&
+          Math.random() < this.activePet.type.specialAbility.triggerChance) {
+        const petDamage = Math.floor(this.totalPetAttack);
+        this.currentMonster.currentHp -= petDamage;
+        this.addCombatLog(`宠物${this.activePet.name}使用${this.activePet.type.specialAbility.name}造成${petDamage}点额外伤害！`);
+      }
     },
     
     monsterAttack() {
-      // 检查是否闪避
+      // 检查宠物"忠诚守护"特殊能力是否触发
+      if (this.activePet && this.activePet.type && 
+          this.activePet.type.specialAbility.effect === 'takeDamage' &&
+          Math.random() < this.activePet.type.specialAbility.triggerChance) {
+        
+        this.addCombatLog(`宠物${this.activePet.name}的${this.activePet.type.specialAbility.name}触发，替你承受了伤害！`);
+        
+        // 宠物承受伤害
+        const damage = Math.max(1, this.currentMonster.attack - this.totalPetDefense / 2);
+        this.activePet.currentHp -= damage;
+        
+        // 显示攻击动画
+        this.showAttackAnimation('monster', damage, false, true);
+        
+        this.addCombatLog(`${this.currentMonster.name}对宠物${this.activePet.name}造成${damage.toFixed(1)}点伤害！`);
+        
+        // 检查宠物是否还活着
+        if (this.activePet.currentHp <= 0) {
+          this.activePet.currentHp = 0;
+          this.addCombatLog(`宠物${this.activePet.name}失去战斗能力！`);
+        }
+        
+        return;
+      }
+      
+      // 计算玩家受到的伤害
+      let damage = Math.max(1, this.currentMonster.attack - this.totalDefense / 2);
+      
+      // 检查玩家是否闪避
       if (Math.random() * 100 < this.totalDodgeRate) {
         this.addCombatLog(`你闪避了${this.currentMonster.name}的攻击！`);
         return;
       }
       
-      // 计算怪物攻击伤害
-      const damage = Math.max(1, this.currentMonster.attack - this.totalDefense / 2);
+      // 玩家宠物闪避技能触发
+      if (this.activePet && this.activePet.type && 
+          this.activePet.type.specialAbility.effect === 'dodgeAttack' &&
+          Math.random() < this.activePet.type.specialAbility.triggerChance) {
+        this.addCombatLog(`宠物${this.activePet.name}的${this.activePet.type.specialAbility.name}触发，帮助你闪避了攻击！`);
+        return;
+      }
       
       // 显示攻击动画
       this.showAttackAnimation('monster', damage, false);
       
       this.player.currentHp -= damage;
-      
       this.addCombatLog(`${this.currentMonster.name}对你造成${damage.toFixed(1)}点伤害！`);
-    },
-    
-    monsterDefeated() {
-      // 应用经验加成
-      let expBonus = 0;
-      for (const slot in this.player.equipment) {
-        if (this.player.equipment[slot] && this.player.equipment[slot].expBonus) {
-          expBonus += this.player.equipment[slot].expBonus;
-        }
-      }
-      
-      // 应用金币加成
-      let goldBonus = 0;
-      for (const slot in this.player.equipment) {
-        if (this.player.equipment[slot] && this.player.equipment[slot].goldBonus) {
-          goldBonus += this.player.equipment[slot].goldBonus;
-        }
-      }
-      
-      // 计算实际获得的经验和金币
-      const expGain = Math.floor(this.currentMonster.exp * (1 + expBonus / 100));
-      const goldGain = Math.floor(this.currentMonster.gold * (1 + goldBonus / 100));
-      
-      // 获得经验和金币
-      this.player.exp += expGain;
-      this.player.gold += goldGain;
-      
-      this.addCombatLog(`击败了${this.currentMonster.name}！获得${expGain}经验和${goldGain}金币！`);
-      
-      // 检查是否掉落装备
-      this.checkItemDrop();
-      
-      // 检查是否升级
-      this.checkLevelUp();
-      
-      // 移除当前怪物
-      this.currentMonster = null;
-      
-      // 战斗胜利后自动保存游戏
-      this.saveGame();
-      
-      // 在战斗结束时额外检查一次自动售出策略
-      this.checkInventoryAndSell();
-      
-      // 添加层级解锁检查
-      if (this.currentArea.level === this.maxReachedLevel && this.currentArea.level < this.areas.length) {
-        this.maxReachedLevel++;
-        this.addCombatLog(`解锁了新区域：${this.areas[this.maxReachedLevel - 1].name}！`);
-        
-        // 如果已经接近生成的区域上限，再生成一批
-        if (this.maxReachedLevel >= this.areas.length - 5) {
-          this.generateAreas();
-        }
-      }
-    },
-    
-    playerDefeated() {
-      this.addCombatLog(`你被${this.currentMonster.name}击败了！`);
-      
-      // 恢复生命值并失去一些金币
-      this.player.currentHp = this.player.maxHp;
-      this.player.gold = Math.floor(this.player.gold * 0.9);
-      
-      // 移除当前怪物
-      this.currentMonster = null;
-    },
-    
-    checkLevelUp() {
-      let leveled = false;
-      while (this.player.exp >= this.expNeededForLevelUp) {
-        this.player.exp -= this.expNeededForLevelUp;
-        this.player.level++;
-        
-        // 属性提升
-        this.player.strength += 1;
-        this.player.agility += 1;
-        this.player.vitality += 1;
-        this.player.intelligence += 1;
-        this.player.luck += 1;
-        
-        // 根据新属性更新最大生命值
-        this.player.maxHp = playerConfig.calculations.maxHp(this.player.vitality, this.player.level);
-        this.player.currentHp = this.player.maxHp;
-        
-        // 更新魔法值
-        this.player.baseMana = playerConfig.calculations.maxMana(this.player.intelligence, this.player.level);
-        this.player.currentMana = this.player.baseMana;
-        
-        this.addCombatLog(`升级了！现在是${this.player.level}级！`);
-        leveled = true;
-      }
-      
-      // 升级后自动保存游戏
-      if (leveled) {
-        this.saveGame();
-      }
-    },
-    
-    checkItemDrop() {
-      // 计算物品掉落率加成
-      let itemFindBonus = playerConfig.calculations.itemFindRate(this.player.luck) / 100;
-      
-      // 装备加成
-      for (const slot in this.player.equipment) {
-        if (this.player.equipment[slot] && this.player.equipment[slot].itemFindBonus) {
-          itemFindBonus += this.player.equipment[slot].itemFindBonus / 100;
-        }
-      }
-      
-      // 计算实际掉落率
-      const dropRate = this.currentMonster.dropRate * (1 + itemFindBonus);
-      
-      // 判断是否掉落装备
-      if (Math.random() < dropRate) {
-        // 随机选择装备类型
-        const equipmentSlots = Object.keys(this.player.equipment);
-        const randomSlot = equipmentSlots[Math.floor(Math.random() * equipmentSlots.length)];
-        
-        // 根据玩家等级和区域确定装备品质
-        let qualityIndex = 0;
-        if (this.player.level >= 5) qualityIndex = 1;
-        if (this.player.level >= 10) qualityIndex = 2;
-        if (this.player.level >= 15) qualityIndex = 3;
-        if (this.player.level >= 20) qualityIndex = 4;
-        
-        // 随机调整品质（可能上下浮动一级）
-        qualityIndex = Math.max(0, Math.min(4, qualityIndex + (Math.random() > 0.7 ? 1 : 0) - (Math.random() > 0.7 ? 1 : 0)));
-        
-        // 获取对应品质的装备
-        const itemList = this.itemTypes[randomSlot];
-        if (itemList && qualityIndex < itemList.length) {
-          const item = { ...itemList[qualityIndex], slot: randomSlot, identified: true };
-          
-          // 添加到背包
-          this.player.inventory.push(item);
-          
-          // 获取对应稀有度的颜色
-          const qualityColor = itemConfig.rarityColors[item.quality] || "#ffffff";
-          
-          this.addCombatLog(`获得了<span style="color:${qualityColor}">【${item.quality}】${item.name}</span>！`);
-          
-          // 检查背包容量并应用自动售出策略
-          this.checkInventoryAndSell();
-        }
-      }
-    },
-    
-    equipItem(item, inventoryIndex) {
-      // 如果已经装备了物品，先卸下并放入背包
-      if (this.player.equipment[item.slot]) {
-        const unequippedItem = {...this.player.equipment[item.slot], identified: true};
-        this.player.inventory.push(unequippedItem);
-      }
-      
-      // 装备新物品
-      this.player.equipment[item.slot] = {...item, identified: true};
-      
-      // 从背包中移除
-      this.player.inventory.splice(inventoryIndex, 1);
-    },
-    
-    unequipItem(slot) {
-      // 确认装备槽有物品
-      if (this.player.equipment[slot]) {
-        // 将物品添加到背包
-        const unequippedItem = {...this.player.equipment[slot], identified: true};
-        this.player.inventory.push(unequippedItem);
-        
-        // 清空装备槽
-        this.player.equipment[slot] = null;
-      }
-    },
-    
-    changeArea(area) {
-      console.log('changeArea被调用', area);
-      // 检查玩家等级是否符合要求
-      if (this.player.level < area.requiredLevel) {
-        this.addCombatLog(`等级不足，无法进入${area.name}！`);
-        return;
-      }
-      
-      this.currentArea = {...area};
-      this.currentMonster = null;
-      this.addCombatLog(`进入了${area.name}！`);
-      this.currentLevel = area.level;
-      console.log('区域切换完成:', this.currentArea);
     },
     
     getItemStats(item) {
@@ -918,14 +825,17 @@ export default {
     },
     
     getSlotName(slot) {
-      const names = {
-        weapon: "武器",
-        armor: "护甲",
-        helmet: "头盔",
-        boots: "靴子",
-        accessory: "饰品"
+      const slotNames = {
+        weapon: '武器',
+        helmet: '头盔',
+        armor: '盔甲',
+        gloves: '手套',
+        boots: '靴子',
+        ring: '戒指',
+        amulet: '护符',
+        pet: '宠物装备'
       };
-      return names[slot] || slot;
+      return slotNames[slot] || slot;
     },
     
     addCombatLog(message) {
@@ -1101,7 +1011,7 @@ export default {
     },
     
     // 新增方法：显示攻击动画
-    showAttackAnimation(attacker, damage, isCrit) {
+    showAttackAnimation(attacker, damage, isCrit, targetPet = false) {
       // 清除现有动画计时器
       if (this.animationTimer) {
         clearTimeout(this.animationTimer);
@@ -1110,7 +1020,9 @@ export default {
       // 设置攻击动画数据
       this.attackAnimation = {
         attacker,
-        damage: isCrit ? `暴击！${damage.toFixed(1)}` : damage.toFixed(1)
+        damage: Math.round(damage * 10) / 10,
+        isCritical: isCrit,
+        targetPet: targetPet
       };
       
       // 设置动画持续时间
@@ -1148,27 +1060,30 @@ export default {
       const theme = themes[Math.floor(level / 10) % themes.length];
       const areaName = `${theme.prefix}${level}层${theme.suffix}`;
       
-      // 根据层级动态生成怪物
-      const monsters = [];
-      for (let i = 0; i < 3; i++) {
-        monsters.push(this.generateMonster(level, i));
-      }
-      
+      // 不再直接生成怪物 - 区域只包含基础信息
       return {
         id: level,
         name: areaName,
         requiredLevel: Math.max(1, level - 5),
         level: level,
-        monsters: monsters
+        monsters: [] // 不再预先生成怪物，战斗时动态生成
       };
     },
     
-    generateMonster(areaLevel, index) {
+    generateMonster(areaOrLevel) {
+      // 判断参数是区域对象还是层级数字
+      let areaLevel;
+      if (typeof areaOrLevel === 'object') {
+        areaLevel = areaOrLevel.level;
+      } else {
+        areaLevel = areaOrLevel;
+      }
+
       const prefixes = ["小", "巨大", "疯狂", "狂暴", "诡异", "远古", "幽灵", "神圣", "黑暗"];
       const monsters = ["史莱姆", "骷髅", "蝙蝠", "石魔像", "巨龙", "狼人", "幽灵", "恶魔", "精灵"];
       const suffixes = ["", "王", "守卫", "首领", "统领", "大师"];
       
-      const nameIndex = (areaLevel + index) % monsters.length;
+      const nameIndex = Math.floor(Math.random() * monsters.length);
       const prefixIndex = Math.floor(areaLevel / 10) % prefixes.length;
       const suffixIndex = Math.floor(areaLevel / 20) % suffixes.length;
       
@@ -1177,14 +1092,23 @@ export default {
       // 指数增长的怪物属性
       const baseMultiplier = Math.pow(1.1, areaLevel);
       
-      return {
+      // 生成怪物实例
+      const monster = {
         name: name,
-        baseHp: 20 * baseMultiplier * (index + 1),
-        baseExp: 5 * baseMultiplier,
-        baseGold: 2 * baseMultiplier,
-        dropRate: 0.2 + (index * 0.05) + (Math.min(0.3, areaLevel * 0.005)),
-        level: areaLevel
+        level: areaLevel,
+        maxHp: Math.floor(20 * baseMultiplier * (1 + Math.random() * 0.5)),
+        currentHp: 0, // 稍后设置
+        exp: Math.floor(5 * baseMultiplier),
+        gold: Math.floor(2 * baseMultiplier),
+        attack: Math.floor(5 * baseMultiplier),
+        defense: Math.floor(2 * baseMultiplier),
+        dropRate: 0.2 + Math.min(0.3, areaLevel * 0.005)
       };
+      
+      // 设置当前生命值
+      monster.currentHp = monster.maxHp;
+      
+      return monster;
     },
     
     // 新增：转生系统
@@ -1564,6 +1488,376 @@ export default {
         // 更新策略对象的特定字段
         this.player.strategies[strategy][field] = value;
       }
+    },
+    
+    // 新增宠物系统相关方法
+    equipPetItem(item, inventoryIndex, petIndex) {
+      // 获取宠物
+      const pet = this.playerPets[petIndex];
+      if (!pet) {
+        console.error('宠物不存在');
+        return;
+      }
+      
+      // 检查物品是否为宠物装备
+      if (!item || item.slot !== 'pet') {
+        this.addCombatLog('这不是宠物可以使用的装备');
+        return;
+      }
+      
+      // 检查宠物装备是否已存在
+      const existingEquipment = this.petEquipments[pet.id];
+      if (existingEquipment) {
+        // 将当前装备放回背包
+        this.player.inventory.push({...existingEquipment});
+      }
+      
+      // 装备新物品
+      this.petEquipments[pet.id] = {...item};
+      
+      // 从背包中移除物品
+      this.player.inventory.splice(inventoryIndex, 1);
+      
+      // 添加装备消息
+      const qualityColor = this.itemConfig.rarityColors[item.quality] || "#ffffff";
+      this.addCombatLog(`你给宠物 ${pet.name} 装备了: <span style="color:${qualityColor}">【${item.quality}】${item.name}</span>`);
+    },
+    
+    unequipPetItem(petId) {
+      // 检查宠物是否存在
+      if (!this.playerPets.some(pet => pet.id === petId)) {
+        console.error('宠物不存在');
+        return;
+      }
+      
+      // 检查宠物是否有装备
+      if (!this.petEquipments[petId]) {
+        this.addCombatLog('该宠物没有装备');
+        return;
+      }
+      
+      // 检查背包是否已满
+      if (this.player.inventory.length >= this.player.inventorySize) {
+        this.addCombatLog('背包已满，无法卸下宠物装备');
+        return;
+      }
+      
+      // 获取宠物装备并复制一份
+      const equipment = {...this.petEquipments[petId]};
+      
+      // 将装备加入背包
+      this.player.inventory.push(equipment);
+      
+      // 清空宠物装备槽
+      this.petEquipments[petId] = null;
+      
+      // 找到宠物名称
+      const pet = this.playerPets.find(p => p.id === petId);
+      const petName = pet ? pet.name : '未知宠物';
+      
+      // 添加卸下装备消息
+      const qualityColor = this.itemConfig.rarityColors[equipment.quality] || "#ffffff";
+      this.addCombatLog(`你卸下了宠物 ${petName} 的装备: <span style="color:${qualityColor}">【${equipment.quality}】${equipment.name}</span>`);
+    },
+    
+    addPet(pet) {
+      this.playerPets.push(pet);
+      this.addCombatLog(`获得了新宠物：${pet.name}`);
+    },
+    
+    updatePlayerGold(gold) {
+      this.player.gold += gold;
+      this.addCombatLog(`金币变化：${gold}，当前金币：${this.player.gold}`);
+    },
+    
+    onPetLevelUp(pet) {
+      this.addCombatLog(`宠物${pet.name}升级了！`);
+    },
+    
+    // 计算宠物给玩家带来的加成值
+    getPetBonusValue(pet) {
+      if (!pet || !pet.type) return 0;
+      
+      const baseBonusValue = pet.type.bonusValue || 0;
+      const levelBonus = pet.level * 0.1 * baseBonusValue;
+      const loyaltyFactor = (pet.loyalty || 50) / 100;
+      
+      return Math.floor((baseBonusValue + levelBonus) * loyaltyFactor);
+    },
+
+    // 更改区域
+    changeArea(selectedArea) {
+      if (!selectedArea) {
+        console.error('区域不存在！');
+        return;
+      }
+      
+      // 检查区域是否锁定
+      if (this.player.level < selectedArea.requiredLevel) {
+        this.addCombatLog(`你的等级不足以进入${selectedArea.name}！至少需要等级${selectedArea.requiredLevel}。`);
+        return;
+      }
+      
+      // 更新当前区域
+      this.currentArea = {...selectedArea};
+      this.currentMonster = null;
+      this.addCombatLog(`进入了${selectedArea.name}！`);
+      this.currentLevel = selectedArea.level;
+      
+      // 更新最高层级
+      if (selectedArea.level > this.maxReachedLevel) {
+        this.maxReachedLevel = selectedArea.level;
+      }
+      
+      console.log('区域切换完成:', this.currentArea);
+    },
+    
+    // 更新 monsterDefeated 方法，确保使用 addCombatLog 而不是 addToCombatLog
+    monsterDefeated() {
+      // 添加怪物死亡日志
+      this.addCombatLog(`你击败了 ${this.currentMonster.name}!`);
+      
+      // 计算获得的经验和金币
+      const expGained = this.currentMonster.exp;
+      const goldGained = this.currentMonster.gold;
+      
+      // 宠物幸运兔脚效果触发 - 增加额外收益
+      let petExpBonus = 0;
+      let petGoldBonus = 0;
+      
+      if (this.activePet && this.activePet.type && 
+          this.activePet.type.specialAbility.effect === 'bonusRewards' &&
+          Math.random() < this.activePet.type.specialAbility.triggerChance) {
+        
+        petExpBonus = Math.floor(expGained * 0.2); // 额外20%经验
+        petGoldBonus = Math.floor(goldGained * 0.2); // 额外20%金币
+        
+        this.addCombatLog(`宠物${this.activePet.name}的${this.activePet.type.specialAbility.name}触发，获得额外经验和金币！`);
+      }
+      
+      // 增加玩家经验和金币
+      this.player.exp += expGained + petExpBonus;
+      this.player.gold += goldGained + petGoldBonus;
+      
+      // 显示获得的经验和金币
+      this.addCombatLog(`获得 ${expGained + petExpBonus} 经验和 ${goldGained + petGoldBonus} 金币!`);
+      
+      // 检查是否升级
+      this.checkLevelUp();
+      
+      // 掉落物品检查
+      this.checkItemDrop();
+      
+      // 宠物物品发现能力触发
+      if (this.activePet && this.activePet.type && 
+          this.activePet.type.specialAbility.effect === 'findItem' &&
+          Math.random() < this.activePet.type.specialAbility.triggerChance) {
+        
+        this.addCombatLog(`宠物${this.activePet.name}的${this.activePet.type.specialAbility.name}触发，发现了额外物品！`);
+        this.generateItemDrop(true); // 生成一个高质量的额外物品
+      }
+      
+      // 清除当前怪物
+      this.currentMonster = null;
+      
+      // 检查自动售出和背包空间
+      this.checkInventoryAndSell();
+    },
+
+    // 添加checkLevelUp方法
+    checkLevelUp() {
+      // 如果经验值大于或等于升级所需经验
+      if (this.player.exp >= this.expNeededForLevelUp) {
+        // 减去升级所需经验
+        this.player.exp -= this.expNeededForLevelUp;
+        // 提升等级
+        this.player.level++;
+        
+        // 更新玩家属性
+        this.updatePlayerStats();
+        
+        // 添加升级消息
+        this.addCombatLog(`恭喜！你提升到了等级 ${this.player.level}！`);
+        
+        // 递归检查是否可以继续升级
+        this.checkLevelUp();
+      }
+    },
+
+    // 更新玩家属性
+    updatePlayerStats() {
+      // 计算新的生命值上限
+      const newMaxHp = playerConfig.calculations.maxHp(
+        this.player.vitality,
+        this.player.level
+      );
+      
+      // 恢复满生命值
+      this.player.maxHp = newMaxHp;
+      this.player.currentHp = newMaxHp;
+      
+      // 更新其他属性
+      this.player.maxMana = playerConfig.calculations.maxMana(
+        this.player.intelligence,
+        this.player.level
+      );
+      this.player.currentMana = this.player.maxMana;
+    },
+
+    // 检查并生成物品掉落
+    checkItemDrop() {
+      // 检查怪物是否有掉落几率
+      if (!this.currentMonster || !this.currentMonster.dropRate) return;
+      
+      // 计算掉落几率（基础掉落率 + 幸运加成）
+      const dropRateBonus = this.player.luck * 0.01; // 每点幸运增加1%掉落率
+      const dropRate = this.currentMonster.dropRate + dropRateBonus;
+      
+      // 随机判断是否掉落物品
+      if (Math.random() < dropRate) {
+        this.generateItemDrop();
+      }
+    },
+
+    // 生成物品掉落
+    generateItemDrop(isSpecialDrop = false) {
+      // 物品类型列表
+      const itemTypes = ['weapon', 'offhand', 'helmet', 'shoulders', 'chest', 'gloves', 'belt', 'pants', 'boots', 'amulet', 'ring1', 'ring2'];
+      
+      // 随机选择一个物品类型
+      const randomTypeIndex = Math.floor(Math.random() * itemTypes.length);
+      const itemType = itemTypes[randomTypeIndex];
+      
+      // 根据怪物等级和是否特殊掉落决定物品品质
+      let qualityChance = Math.random();
+      // 特殊掉落提高品质
+      if (isSpecialDrop) {
+        qualityChance = Math.max(0, qualityChance - 0.3);
+      }
+      
+      // 增加怪物等级对物品品质的影响
+      qualityChance -= this.currentMonster.level * 0.005;
+      
+      // 决定物品品质
+      let quality;
+      if (qualityChance < 0.05) {
+        quality = "传说";
+      } else if (qualityChance < 0.15) {
+        quality = "史诗";
+      } else if (qualityChance < 0.35) {
+        quality = "稀有";
+      } else if (qualityChance < 0.60) {
+        quality = "优质";
+      } else {
+        quality = "普通";
+      }
+      
+      // 获取物品类型中的所有物品
+      const itemsOfType = this.itemConfig.itemTypes[itemType] || [];
+      if (itemsOfType.length === 0) return;
+      
+      // 筛选指定品质的物品
+      const itemsOfQuality = itemsOfType.filter(item => item.quality === quality);
+      
+      // 如果没有指定品质的物品，随机选择一个物品
+      let selectedItem;
+      if (itemsOfQuality.length > 0) {
+        selectedItem = itemsOfQuality[Math.floor(Math.random() * itemsOfQuality.length)];
+      } else {
+        selectedItem = itemsOfType[Math.floor(Math.random() * itemsOfType.length)];
+      }
+      
+      // 创建物品副本，添加槽位信息
+      const droppedItem = {...selectedItem, slot: itemType};
+      
+      // 添加物品到背包
+      this.player.inventory.push(droppedItem);
+      
+      // 显示掉落消息
+      const qualityColor = this.itemConfig.rarityColors[droppedItem.quality] || "#ffffff";
+      this.addCombatLog(`获得物品: <span style="color:${qualityColor}">【${droppedItem.quality}】${droppedItem.name}</span>`);
+    },
+
+    // 处理玩家被击败
+    playerDefeated() {
+      // 添加被击败消息
+      this.addCombatLog(`你被 ${this.currentMonster.name} 击败了！`);
+      
+      // 计算惩罚（失去部分金币）
+      const goldLoss = Math.floor(this.player.gold * 0.05); // 失去5%的金币
+      if (goldLoss > 0) {
+        this.player.gold = Math.max(0, this.player.gold - goldLoss);
+        this.addCombatLog(`你失去了 ${goldLoss} 金币！`);
+      }
+      
+      // 恢复一部分生命值
+      this.player.currentHp = Math.floor(this.player.maxHp * 0.5); // 恢复50%生命值
+      
+      // 清除当前怪物
+      this.currentMonster = null;
+      
+      // 添加恢复消息
+      this.addCombatLog(`你慢慢恢复了一些生命值...`);
+    },
+
+    // 装备物品
+    equipItem(item, inventoryIndex) {
+      // 检查slot是否存在
+      if (!item || !item.slot) {
+        console.error('物品不存在或没有slot属性');
+        return;
+      }
+      
+      // 如果已有装备，先卸下
+      const currentEquipment = this.player.equipment[item.slot];
+      if (currentEquipment) {
+        // 将当前装备放回背包
+        this.player.inventory.push({...currentEquipment});
+      }
+      
+      // 装备新物品
+      this.player.equipment[item.slot] = {...item};
+      
+      // 从背包中移除物品
+      this.player.inventory.splice(inventoryIndex, 1);
+      
+      // 获取装备槽位的中文名称
+      const slotName = this.getSlotName(item.slot);
+      
+      // 添加装备消息
+      const qualityColor = this.itemConfig.rarityColors[item.quality] || "#ffffff";
+      this.addCombatLog(`你装备了 ${slotName}: <span style="color:${qualityColor}">【${item.quality}】${item.name}</span>`);
+    },
+
+    // 卸下装备
+    unequipItem(slot) {
+      // 检查装备槽是否有物品
+      if (!this.player.equipment[slot]) {
+        console.error('该装备槽没有装备');
+        return;
+      }
+      
+      // 检查背包是否已满
+      if (this.player.inventory.length >= this.player.inventorySize) {
+        this.addCombatLog('背包已满，无法卸下装备');
+        return;
+      }
+      
+      // 获取当前装备并复制一份
+      const equipment = {...this.player.equipment[slot]};
+      
+      // 将装备加入背包
+      this.player.inventory.push(equipment);
+      
+      // 清空装备槽
+      this.player.equipment[slot] = null;
+      
+      // 获取装备槽位的中文名称
+      const slotName = this.getSlotName(slot);
+      
+      // 添加卸下装备消息
+      const qualityColor = this.itemConfig.rarityColors[equipment.quality] || "#ffffff";
+      this.addCombatLog(`你卸下了 ${slotName}: <span style="color:${qualityColor}">【${equipment.quality}】${equipment.name}</span>`);
     },
   }
 };

@@ -41,13 +41,31 @@
         </div>
       </div>
       
+      <!-- 宠物角色 -->
+      <div class="pet-character" v-if="activePet">
+        <div class="character-avatar pet-avatar">
+          <div class="pet-icon">{{ activePet.type.icon }}</div>
+          
+          <!-- 宠物血条 -->
+          <div class="health-bar pet-health">
+            <div class="health-bar-fill" :style="{ width: petHealthPercentage + '%' }"></div>
+          </div>
+          <p class="character-hp" :title="`${activePet.currentHp.toFixed(1)}/${activePet.maxHp.toFixed(1)}`">
+            {{ Math.floor(activePet.currentHp) }}/{{ Math.floor(activePet.maxHp) }}
+          </p>
+        </div>
+        <div class="character-name">{{ activePet.name }}</div>
+        <div class="pet-level">Lv.{{ activePet.level }}</div>
+      </div>
+      
       <div class="battle-actions">
         <!-- 战斗动画区域 -->
         <div class="battle-animation" v-if="attackAnimation">
           <div :class="[
             'animation-effect', 
             attackAnimation.attacker === 'player' ? 'player-attack' : 'monster-attack',
-            attackAnimation.isCritical ? 'critical-hit' : ''
+            attackAnimation.isCritical ? 'critical-hit' : '',
+            attackAnimation.targetPet ? 'target-pet' : ''
           ]">
             {{ attackAnimation.damage }}
             <span v-if="attackAnimation.isCritical" class="critical-text">暴击!</span>
@@ -170,6 +188,10 @@ export default {
     totalDodgeRate: {
       type: Number,
       required: true
+    },
+    activePet: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -180,6 +202,11 @@ export default {
     
     playerHealthPercentage() {
       return (this.player.currentHp / this.player.maxHp) * 100;
+    },
+    
+    petHealthPercentage() {
+      if (!this.activePet) return 0;
+      return (this.activePet.currentHp / this.activePet.maxHp) * 100;
     }
   },
   methods: {
@@ -228,7 +255,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.player-character, .monster-character {
+.player-character, .monster-character, .pet-character {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -278,79 +305,62 @@ export default {
   background-color: #e74c3c;
 }
 
-.character-name {
-  margin-top: 8px;
-  font-weight: bold;
-  font-size: 1.1em;
+.pet-health .health-bar-fill {
+  background-color: #9b59b6;
 }
 
 .character-hp {
-  margin: 2px 0;
-  font-size: 12px;
-  color: #666;
-  cursor: help;
-  transition: color 0.3s ease;
-}
-
-.character-hp:hover {
+  font-size: 0.9rem;
+  margin: 0;
   color: #333;
 }
 
-.monster-level {
-  font-size: 12px;
-  color: #95a5a6;
-  background: #f1f1f1;
-  padding: 2px 6px;
-  border-radius: 3px;
+.character-name {
+  font-weight: bold;
+  margin: 5px 0;
 }
 
-.character-stats, .monster-stats {
-  margin-top: 8px;
-  font-size: 12px;
+.monster-level, .pet-level {
+  font-size: 0.8rem;
   color: #666;
+  margin-bottom: 5px;
+}
+
+.character-stats {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .stat-item {
   display: flex;
   justify-content: space-between;
-  margin: 2px 0;
+  font-size: 0.85rem;
+  margin: 3px 0;
 }
 
 .stat-label {
-  color: #999;
+  color: #555;
 }
 
-.status-effects {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.status-effect {
-  font-size: 10px;
-  padding: 2px 4px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
+.stat-value {
+  font-weight: bold;
+  color: #333;
 }
 
 .combat-log {
   height: 200px;
   overflow-y: auto;
-  background-color: #f8f9fa;
+  padding: 10px;
+  background-color: #fff;
   border-radius: 8px;
-  padding: 15px;
   border: 1px solid #e0e0e0;
 }
 
 .combat-log p {
   margin: 5px 0;
-  padding: 5px;
-  border-bottom: 1px solid #ecf0f1;
-  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .critical-log {
@@ -360,109 +370,126 @@ export default {
 
 .dodge-log {
   color: #3498db;
-  font-weight: bold;
+  font-style: italic;
 }
 
 .damage-log {
   color: #e67e22;
 }
 
-/* 战斗动画 */
 .battle-actions {
-  flex: 1;
-  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 150px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
 .battle-animation {
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 80px;
 }
 
 .animation-effect {
+  position: absolute;
   font-weight: bold;
-  padding: 8px 15px;
-  border-radius: 5px;
-  animation-duration: 0.8s;
-  animation-fill-mode: forwards;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  font-size: 1.5rem;
+  animation: damage-animation 1.2s ease-out forwards;
+  text-shadow: 0 0 5px white;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.critical-hit {
-  animation-duration: 1s;
-  transform: scale(1.2);
-}
-
-.critical-text {
-  font-size: 0.8em;
-  color: #e74c3c;
-  margin-top: 2px;
-}
-
 .player-attack {
-  color: #e74c3c;
-  animation-name: playerAttackEffect;
+  color: #2ecc71;
+  right: 50px;
 }
 
 .monster-attack {
-  color: #3498db;
-  animation-name: monsterAttackEffect;
+  color: #e74c3c;
+  left: 50px;
 }
 
-.battle-tips {
+.critical-hit {
+  font-size: 1.8rem;
+  color: #e74c3c;
+}
+
+.critical-text {
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
+/* 宠物特定样式 */
+.pet-character {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+  left: 25%;
+  top: 70%;
+  transform: translateX(-50%);
 }
 
-.tip-message {
-  padding: 8px 15px;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  animation: fadeInOut 2s ease-in-out;
+.pet-avatar {
+  background-color: #f0f8ff;
+  border-radius: 50%;
+  padding: 8px;
+  border: 2px solid #a0d0ff;
 }
 
-@keyframes playerAttackEffect {
-  0% { opacity: 0; transform: translateX(-100px) scale(0.8); }
-  30% { opacity: 1; transform: translateX(0) scale(1); }
-  70% { opacity: 1; transform: translateX(0) scale(1); }
-  100% { opacity: 0; transform: translateX(100px) scale(0.8); }
+.pet-icon {
+  font-size: 40px;
+  text-align: center;
+  margin: 0 auto;
 }
 
-@keyframes monsterAttackEffect {
-  0% { opacity: 0; transform: translateX(100px) scale(0.8); }
-  30% { opacity: 1; transform: translateX(0) scale(1); }
-  70% { opacity: 1; transform: translateX(0) scale(1); }
-  100% { opacity: 0; transform: translateX(-100px) scale(0.8); }
+.target-pet {
+  position: absolute;
+  top: 70%;
+  left: 25%;
+  transform: translateX(-50%);
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-  20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+@keyframes damage-animation {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1);
+  }
 }
 
-.stat-value {
-  cursor: help;
-  transition: color 0.3s ease;
-}
+/* 适配小屏幕设备 */
+@media (max-width: 768px) {
+  .battle-scene {
+    flex-direction: column;
+    height: auto;
+    padding: 15px;
+  }
 
-.stat-value:hover {
-  color: #333;
+  .player-character, .monster-character {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .battle-actions {
+    position: relative;
+    transform: none;
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin: 10px 0;
+  }
 }
 </style> 
