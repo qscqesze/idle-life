@@ -1,16 +1,14 @@
 <template>
-  <div id="app">
-    <IdleGame />
-  </div>
+  <Game />
 </template>
 
 <script>
-import IdleGame from './components/IdleGame.vue'
+import Game from './components/Game.vue'
 
 export default {
   name: 'App',
   components: {
-    IdleGame
+    Game
   }
 }
 </script>
@@ -22,16 +20,14 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 20px;
-  width: 100%;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 60px;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background-color: #f0f0f0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 }
 </style>
